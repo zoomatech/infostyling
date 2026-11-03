@@ -1,0 +1,8 @@
+STYLE_LABELS=[('engraving','Engraving / Catalog'),('impressionist','Impressionistic'),('cubist','Faceted / Cubist'),('surreal','Surreal / Warped'),('penskip','Pen-Skip / Nervous Line'),('stipple','Stipple'),('fractal','Fractal Organic')]
+# property, profile key, label, min, max, default, scale
+PARAMS=[
+ ('strength','strength','Style strength',0,100,58,1),('cell-size','cell_size','Visible style cell size',6,96,18,1),('density','density','Mark density',1,100,62,1),('contrast','contrast','Contrast modulation',0,100,58,1),('luminance','luminance','Luminance modulation',0,100,24,1),('hue','hue','Color / hue modulation',0,100,0,1),('inversion','inversion','Partial contrast inversion',0,100,8,1),('carrier','carrier','Visible payload bias',0,100,45,1),('wobble-x10','wobble','Line/path deviation ×10',0,240,18,.1),('wobble-scale','wobble_scale','Fractal spatial scale',4,128,26,1),('payload-wobble','payload_wobble','Payload to wobble bias',0,100,25,1),('octaves','octaves','Fractal octaves',1,7,3,1),('persistence-x100','persistence','Fractal persistence ×100',10,90,52,.01),('lacunarity-x100','lacunarity','Fractal lacunarity ×100',120,350,200,.01),('line-width-x10','line_width','Mark / line width ×10',5,80,12,.1),('orientation','orientation','Base orientation',-180,180,32,1),('roughness','roughness','Irregularity',0,100,26,1),('blind-cell','blind_cell','ISB3 carrier cell size',8,40,16,1),('blind-strength','blind_strength','ISB3 carrier strength',0,100,74,1),('seed','seed','Seed',0,2147483647,24681357,1)]
+def profile(c):
+ p={'style':c.get_property('style')}
+ for name,key,_,_,_,_,scale in PARAMS:p[key]=c.get_property(name)*scale
+ return p
