@@ -1,0 +1,18 @@
+"use strict";
+const PRESETS={
+ engraving:{strength:58,cellSize:18,density:62,contrast:58,luminance:24,hue:0,inversion:8,carrier:45,wobble:1.8,wobbleScale:26,payloadWobble:25,octaves:3,persistence:.52,lacunarity:2,lineWidth:1.2,orientation:32,roughness:26,blindCell:16,blindStrength:74,redundancy:2},
+ impressionist:{strength:52,cellSize:24,density:70,contrast:32,luminance:32,hue:46,inversion:7,carrier:30,wobble:4.5,wobbleScale:34,payloadWobble:42,octaves:4,persistence:.58,lacunarity:2.1,lineWidth:2.4,orientation:18,roughness:58,blindCell:16,blindStrength:74,redundancy:2},
+ cubist:{strength:57,cellSize:28,density:55,contrast:48,luminance:26,hue:30,inversion:10,carrier:34,wobble:1.5,wobbleScale:42,payloadWobble:22,octaves:2,persistence:.48,lacunarity:2,lineWidth:2,orientation:45,roughness:20,blindCell:16,blindStrength:74,redundancy:2},
+ surreal:{strength:55,cellSize:22,density:64,contrast:36,luminance:31,hue:38,inversion:16,carrier:34,wobble:7,wobbleScale:48,payloadWobble:58,octaves:5,persistence:.61,lacunarity:2.05,lineWidth:1.8,orientation:7,roughness:72,blindCell:16,blindStrength:76,redundancy:2},
+ penskip:{strength:60,cellSize:14,density:48,contrast:52,luminance:18,hue:0,inversion:12,carrier:40,wobble:5.8,wobbleScale:22,payloadWobble:68,octaves:4,persistence:.63,lacunarity:2.2,lineWidth:1.2,orientation:0,roughness:78,blindCell:16,blindStrength:78,redundancy:3},
+ stipple:{strength:50,cellSize:16,density:68,contrast:42,luminance:22,hue:8,inversion:5,carrier:50,wobble:1,wobbleScale:18,payloadWobble:18,octaves:2,persistence:.5,lacunarity:2,lineWidth:1.5,orientation:0,roughness:36,blindCell:16,blindStrength:78,redundancy:3},
+ fractal:{strength:54,cellSize:20,density:64,contrast:35,luminance:25,hue:20,inversion:8,carrier:36,wobble:8.5,wobbleScale:30,payloadWobble:72,octaves:6,persistence:.64,lacunarity:2.15,lineWidth:1.5,orientation:12,roughness:85,blindCell:16,blindStrength:76,redundancy:2}
+};
+PRESETS.glyph={...PRESETS.engraving};
+PRESETS.colorpop={...PRESETS.engraving};
+PRESETS.tract={...PRESETS.engraving};
+PRESETS.none={...PRESETS.engraving};
+const CONTROLS=[
+ ["strength","Style strength",0,100,1],["cellSize","Visible style cell size",6,96,1],["density","Mark density",1,100,1],["contrast","Contrast modulation",0,100,1],["luminance","Luminance modulation",0,100,1],["hue","Color / hue modulation",0,100,1],["inversion","Partial contrast inversion",0,100,1],["carrier","Visible payload bias",0,100,1],["wobble","Line/path deviation (px)",0,24,.1],["wobbleScale","Fractal spatial scale",4,128,1],["payloadWobble","Payload → wobble bias",0,100,1],["octaves","Fractal octaves",1,7,1],["persistence","Fractal persistence",.1,.9,.01],["lacunarity","Fractal lacunarity",1.2,3.5,.05],["lineWidth","Mark / line width",.5,8,.1],["orientation","Base orientation",-180,180,1],["roughness","Irregularity",0,100,1],["blindCell","ISB3 carrier cell size",8,40,1],["blindStrength","ISB3 carrier strength",0,100,1],["redundancy","Visible-channel redundancy",1,6,1]
+];
+module.exports={PRESETS,CONTROLS,DEFAULT_SEED:24681357,STORAGE_KEY:"infostyling.v07"};

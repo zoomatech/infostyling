@@ -1,0 +1,27 @@
+"use strict";
+const {app,core,imaging,constants,action}=require("photoshop"),{storage}=require("uxp");
+const px=v=>typeof v==="number"?v:v&&typeof v._value==="number"?v._value:Number(v)||0;
+function active(){if(!app.documents.length)return null;const doc=app.activeDocument,layer=doc.activeLayers&&doc.activeLayers[0];if(!layer)return null;const b=layer.boundsNoEffects;return{doc,layer,b,width:Math.max(0,Math.ceil(px(b.right))-Math.floor(px(b.left))),height:Math.max(0,Math.ceil(px(b.bottom))-Math.floor(px(b.top)))}}
+async function pixels(doc,layer,bounds){const b=bounds||layer.boundsNoEffects,sourceBounds={left:Math.floor(px(b.left)),top:Math.floor(px(b.top)),right:Math.ceil(px(b.right)),bottom:Math.ceil(px(b.bottom))},obj=await imaging.getPixels({documentID:doc.id,layerID:layer.id,sourceBounds,colorSpace:"RGB",componentSize:8,applyAlpha:false}),data=await obj.imageData.getData({chunky:true});return{obj,data,width:obj.imageData.width,height:obj.imageData.height,components:obj.imageData.components,bounds:obj.sourceBounds}}
+async function selection(doc,bounds,w,h,enabled){if(!enabled)return null;try{if(!doc.selection||!doc.selection.bounds)return null;const obj=await imaging.getSelection({documentID:doc.id,sourceBounds:bounds,targetSize:{width:w,height:h}}),data=await obj.imageData.getData({chunky:true});return{obj,data}}catch(e){return null}}
+function blend(orig,styled,c,mask){if(!mask)return styled;const out=new Uint8Array(styled.length);for(let i=0,m=0;i<styled.length;i+=c,m++){const t=(mask[m]||0)/255;for(let k=0;k<c;k++)out[i+k]=Math.round(orig[i+k]*(1-t)+styled[i+k]*t)}return out}
+function sourceId(name){const m=/\[IS5 cell=\d+ src=(\d+)\]/.exec(name||"");return m?Number(m[1]):null}
+function findLayer(layers,id){for(const l of layers){if(l.id===id)return l;if(l.layers&&l.layers.length){const f=findLayer(l.layers,id);if(f)return f}}return null}
+async function modal(fn,name){return core.executeAsModal(fn,{commandName:name})}
+async function duplicateRaster(layer){const copy=await layer.duplicate();if(copy.kind!==constants.LayerKind.NORMAL)await copy.rasterize(constants.RasterizeType.ENTIRELAYER);return copy}
+async function put(doc,layer,read,data,name){const image=await imaging.createImageDataFromBuffer(data,{width:read.width,height:read.height,components:read.components,chunky:true,colorSpace:"RGB",colorProfile:read.obj.imageData.colorProfile});try{await imaging.putPixels({documentID:doc.id,layerID:layer.id,imageData:image,replace:true,targetBounds:{left:read.bounds.left,top:read.bounds.top},commandName:name})}finally{image.dispose()}}
+function checkLossless(doc){const B=constants.BitsPerChannelType,D=constants.DocumentMode;if(B&&B.EIGHT!==undefined&&doc.bitsPerChannel!==B.EIGHT)throw new Error("High capacity needs an 8-bit document: Image > Mode > 8 Bits/Channel.");if(D&&D.RGB!==undefined&&doc.mode!==D.RGB)throw new Error("High capacity needs an RGB document: Image > Mode > RGB Color.")}
+// Lossless text lives in the lowest bit of each value, so any colour conversion after encoding erases it.
+// PNG saves from Photoshop can only label a few colour spaces (sRGB, Display P3); other profiles, such as a Mac
+// screenshot's display profile, get converted on save. Converting to sRGB first keeps the saved values exact.
+const SRGB="sRGB IEC61966-2.1";
+async function ensureSRGB(doc){let name="";try{name=String(doc.colorProfileName||"")}catch(e){}if(name===SRGB)return null;const I=constants.Intent||{};await doc.convertProfile(SRGB,I.RELATIVECOLORIMETRIC!==undefined?I.RELATIVECOLORIMETRIC:"relativeColorimetric",true,false);return name||"its previous profile"}
+function topLevel(doc,layer){let l=layer;while(l&&l.parent)l=l.parent;return l}
+// Saves a flattened copy showing only the encoded layer (its own top-level stack), then restores layer visibility. Call inside modal.
+async function saveCopy(doc,layer,file,format){const keep=topLevel(doc,layer),prev=doc.layers.map(l=>[l,l.visible]);try{for(const[l]of prev)l.visible=l.id===keep.id;layer.visible=true;
+  try{if(format==="jpg")await doc.saveAs.jpg(file,{quality:12,embedColorProfile:true},true);else await doc.saveAs.png(file,{compression:6,interlaced:false},true)}catch(e){await batchSave(file,format)}
+  let size=0;try{size=(await file.getMetadata()).size}catch(e){size=1}if(!size)await batchSave(file,format)}finally{for(const[l,v]of prev)try{l.visible=v}catch(e){}}}
+async function batchSave(file,format){const token=await storage.localFileSystem.createSessionToken(file),as=format==="jpg"?{_obj:"JPEG",extendedQuality:12,matteColor:{_enum:"matteColor",_value:"none"}}:{_obj:"PNGFormat",method:{_enum:"PNGMethod",_value:"quick"},PNGInterlaceType:{_enum:"PNGInterlaceType",_value:"PNGInterlaceNone"},compression:6};await action.batchPlay([{_obj:"save",as,in:{_path:token,_kind:"local"},copy:true,lowerCase:true}],{})}
+// UXP <img> elements only take JPEG data URLs, so previews go through Photoshop's own JPEG encoder.
+async function jpegDataUrl(rgb,width,height){const image=await imaging.createImageDataFromBuffer(rgb,{width,height,components:3,chunky:true,colorSpace:"RGB"});try{const enc=()=>imaging.encodeImageData({imageData:image,base64:true});let b64;try{b64=await enc()}catch(e){await core.executeAsModal(async()=>{b64=await enc()},{commandName:"InfoStyling Preview"})}return"data:image/jpeg;base64,"+b64}finally{image.dispose()}}
+module.exports={jpegDataUrl,num:px,saveCopy,checkLossless,ensureSRGB,app,active,pixels,selection,blend,sourceId,findLayer,modal,duplicateRaster,put};

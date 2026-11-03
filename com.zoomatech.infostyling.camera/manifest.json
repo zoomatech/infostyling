@@ -1,0 +1,39 @@
+{
+  "manifestVersion": 5,
+  "id": "com.zoomatech.infostyling.camera",
+  "name": "InfoStyling",
+  "version": "0.13.0",
+  "main": "index.html",
+  "host": {
+    "app": "PS",
+    "minVersion": "25.0.0"
+  },
+  "entrypoints": [
+    {
+      "type": "panel",
+      "id": "infostylingPanel",
+      "label": {
+        "default": "InfoStyling"
+      },
+      "minimumSize": {
+        "width": 320,
+        "height": 560
+      },
+      "maximumSize": {
+        "width": 1000,
+        "height": 1600
+      },
+      "preferredDockedSize": {
+        "width": 380,
+        "height": 820
+      },
+      "preferredFloatingSize": {
+        "width": 430,
+        "height": 900
+      }
+    }
+  ],
+  "requiredPermissions": {
+    "localFileSystem": "request"
+  }
+}

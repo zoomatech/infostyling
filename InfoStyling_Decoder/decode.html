@@ -1,0 +1,31 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>InfoStyling Decoder: decode a file</title>
+<style>
+:root{color-scheme:light dark;--bg:#fff;--fg:#1b1d22;--muted:#5b6270;--line:#d9dde4;--card:#f6f7f9;--accent:#1f4fd1;--err:#b3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#1f2227;--fg:#e7e9ee;--muted:#a3a9b5;--line:#3a3f48;--card:#2a2e35;--accent:#8fb0ff;--err:#ff8a80}}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:24px 16px}
+h1{font-size:20px;margin:0 0 4px}.sub{color:var(--muted);margin:0 0 16px}
+#drop{border:2px dashed var(--line);border-radius:12px;padding:32px 16px;text-align:center;background:var(--card);cursor:pointer}
+#drop.over{border-color:var(--accent)}
+#drop b{color:var(--accent)}
+label{display:flex;align-items:center;gap:8px;margin:12px 0}
+#status{margin:16px 0 6px;font-weight:600}#status.err{color:var(--err)}
+#meta{color:var(--muted);font-size:12px}
+#text{white-space:pre-wrap;word-break:break-word;background:var(--card);border-radius:10px;padding:12px;max-height:60vh;overflow:auto}
+.row{display:flex;gap:8px;margin-top:8px}
+button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;padding:4px 12px;cursor:pointer}
+[hidden]{display:none!important}
+</style></head>
+<body><main>
+<h1>Decode an image file</h1>
+<p class="sub">Use this for images saved on your computer. Chrome does not let extensions read local file:// pages, so pick or drop the file here instead.</p>
+<div id="drop" tabindex="0"><b>Choose an image</b> or drag one here<br><small>PNG, JPEG, WebP, GIF, BMP</small></div>
+<input type="file" id="file" accept="image/*" hidden>
+<label><input type="checkbox" id="deep" checked> Deep robust scan (slower, finds more Robust messages)</label>
+<div id="status" hidden></div><div id="meta"></div>
+<div id="out" hidden><div id="text"></div><div class="row"><button id="copy">Copy</button><button id="save">Save .txt</button></div></div>
+</main>
+<script src="lib/infostyling-core.js"></script>
+<script src="decode.js"></script>
+</body></html>

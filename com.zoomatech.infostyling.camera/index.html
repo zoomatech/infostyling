@@ -1,0 +1,56 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>InfoStyling</title><link rel="stylesheet" href="styles.css"></head>
+<body><main>
+<header><h1>InfoStyling</h1><div class="sub">Hide text inside an image, then read it back.</div></header>
+<section class="box">
+  <div class="sectionTitle">1. Your text</div>
+  <textarea id="message" rows="4" placeholder="Type or paste the text to hide, or load a file..."></textarea>
+  <div class="btnrow"><button id="loadFile">Load text or EPUB file…</button><button id="clearText">Clear</button></div>
+  <div id="payloadSize" class="small">No text yet.</div>
+  <label class="small">Sign as (your name). Leave blank for no seal.<input id="signName" type="text" placeholder="Your name"></label>
+  <div id="keyId" class="small"></div>
+</section>
+<section class="box">
+  <div class="sectionTitle">2. Click a look, choose Shareable or Full resolution, then press Apply filter</div>
+  <div class="small">Previews show the middle of your image. <b>Shareable</b> saves a JPEG that survives social media (short text). <b>Full resolution</b> saves a lossless PNG that holds a whole book, but must be shared as the original file.</div>
+  <sp-radio-group id="outGroup" class="outGroup"><sp-radio id="outShare" value="share" checked>Shareable (JPEG)</sp-radio><sp-radio id="outFull" value="full">Full resolution (PNG)</sp-radio></sp-radio-group>
+  <div id="space" class="space"></div>
+  <div id="looks" class="looks"></div>
+  <button id="refreshPreviews" class="wide">Refresh previews</button>
+  <sp-button id="applyFilter" variant="cta" class="applyBtn">Apply filter</sp-button>
+  <div id="lookStatus" class="lookStatus"></div>
+</section>
+<section class="box">
+  <div class="sectionTitle">3. Read hidden text</div>
+  <button id="decodeBlind" class="primary wide">Read hidden text from this image</button>
+  <textarea id="decoded" rows="4" readonly placeholder="Recovered text appears here."></textarea>
+  <button id="saveFile" class="wide">Save decoded text…</button>
+</section>
+<section class="status"><div id="status">Ready.</div></section>
+<button id="advToggle" class="wide">Show advanced settings ▸</button>
+<div id="advanced" class="hidden">
+<section><label>Seed<input id="seed" type="number" value="24681357" step="1"></label></section>
+<section class="actions">
+  <button id="decodeCamera">Read photo of a print</button>
+  <button id="decodePaired">Read using source layer</button>
+</section>
+<section><div class="sectionTitle">Cover effects (added to every look)</div><div id="effects"></div></section>
+<section class="checks">
+  <label><input id="respectSelection" type="checkbox"> Filter only inside the active selection</label>
+  <label><input id="deepSearch" type="checkbox" checked> Deep search when reading (slower)</label>
+  <label><input id="cameraSearch" type="checkbox"> Automatic angle search (much slower)</label>
+</section>
+<section class="cameraBox">
+  <div class="sectionTitle">Photo-of-a-print recovery</div>
+  <label>Rotation correction (degrees)<input id="rotationHint" type="number" value="0" min="-30" max="30" step="0.5"></label>
+  <label>Artwork corners as % of selected raster: TL; TR; BR; BL<input id="quad" type="text" value="0,0;100,0;100,100;0,100"></label>
+  <div class="grid2">
+    <label>Rectified width (0 auto)<input id="rectWidth" type="number" value="0" min="0" step="1"></label>
+    <label>Rectified height (0 auto)<input id="rectHeight" type="number" value="0" min="0" step="1"></label>
+    <label>Lens k1<input id="lensK1" type="number" value="0" min="-0.5" max="0.5" step="0.005"></label>
+    <label>Lens k2<input id="lensK2" type="number" value="0" min="-0.5" max="0.5" step="0.005"></label>
+  </div>
+  <div class="small">For a photographed print, enter the four artwork corners clockwise. If you know the original exported pixel dimensions, entering them as rectified width/height speeds recovery.</div>
+</section>
+</div>
+</main><script src="index.js"></script></body></html>
