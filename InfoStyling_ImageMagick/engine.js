@@ -1,0 +1,4 @@
+"use strict";
+const codec=require("./core/codec.js"),style=require("./core/style.js"),layout=require("./core/layout.js"),carrier=require("./core/carrier.js"),geometry=require("./core/geometry.js"),decoder=require("./core/decoder.js"),noise=require("./core/math.js");
+function pairedCapacityBytes(w,h,cell,redundancy){const cells=Math.ceil(w/Math.max(4,cell))*Math.ceil(h/Math.max(4,cell));return Math.max(0,Math.floor(Math.floor(cells/Math.max(1,redundancy))/8)-codec.HEADER_BYTES)}
+module.exports={render:style.render,pairedCapacityBytes,v3FrameBits:codec.v3FrameBits,tilePeriod:layout.tilePeriod,blindCapacityBytes:layout.blindCapacityBytes,blindPattern:carrier.blindPattern,applyBlindCarrier:carrier.applyBlindCarrier,extractGrid:carrier.extractGrid,decodeBlind:decoder.decodeBlind,decodePaired:decoder.decodePaired,...geometry,fbm:noise.fbm,valueNoise:noise.valueNoise,hash2:noise.hash2};
