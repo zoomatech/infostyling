@@ -14,7 +14,7 @@ from gi.repository import Gimp, GimpUi, Gegl, GObject, GLib, Gio, Gtk, Gdk, GdkP
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from iscore import codec, dense, brightq, glyph, chroma, fractional, decoder, looks, seal, epub, pack, engine, presets, effects as fxmod, config as isconfig
 
-VERSION = "0.13.0"
+VERSION = "0.14.0"
 PROC = "plug-in-infostyling"
 FMT = "R'G'B'A u8"
 PREVIEW_CHARS = 20000
@@ -168,7 +168,7 @@ class Panel:
         f = Gtk.Frame()
         f.get_style_context().add_class("box")
         v = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
-        v.set_border_width(8)
+        v.set_border_width(12)
         t = self.label(title, "sectionTitle")
         v.pack_start(t, False, False, 0)
         f.add(v)
@@ -195,20 +195,29 @@ class Panel:
     def css(self):
         p = Gtk.CssProvider()
         p.load_from_data(b"""
-        .sectionTitle { font-weight: bold; }
-        .small { font-size: 90%; }
-        .over { color: #e5484d; font-weight: bold; }
-        .space { border: 1px solid rgba(128,128,128,.45); border-radius: 4px; padding: 7px; }
-        .space.over { border-color: #e5484d; color: #e5484d; }
-        .tile { border: 2px solid rgba(128,128,128,.45); border-radius: 5px; padding: 4px; }
-        .tile.picked { border: 3px solid #2680eb; background-color: rgba(38,128,235,.12); }
-        .tilename { font-weight: bold; }
-        .tilenote { font-size: 85%; }
-        .tilespace { font-size: 85%; font-weight: bold; }
-        .working { color: #2680eb; font-weight: bold; }
-        .ok { color: #2d9d78; font-weight: bold; border: 2px solid #2d9d78; border-radius: 4px; padding: 7px; }
-        .bad { color: #e5484d; font-weight: bold; border: 2px solid #e5484d; border-radius: 4px; padding: 7px; }
-        .ph { background-color: rgba(128,128,128,.25); }
+        /* InfoStyling v0.14.0 look: step cards with an accent edge, card-style look tiles, coloured result boxes. */
+        .is-header { padding: 2px 2px 10px 2px; border-bottom: 1px solid alpha(currentColor, .18); margin-bottom: 4px; }
+        .box { background-color: alpha(currentColor, .045); border: 1px solid alpha(currentColor, .16); border-left: 4px solid #3d8bfd; border-radius: 8px; }
+        .box > border { border: none; }
+        .box label, .box radiobutton, .tile label, .tile radiobutton { background-color: transparent; background-image: none; }
+        .sectionTitle { font-weight: 800; font-size: 105%; margin-bottom: 2px; }
+        .small { font-size: 90%; opacity: .78; }
+        .over { color: #f0605d; font-weight: bold; }
+        .space { background-color: alpha(#3d8bfd, .14); border: 1px solid #3d8bfd; border-radius: 6px; padding: 8px 10px; font-weight: 600; }
+        .space.over { background-color: alpha(#f0605d, .14); border-color: #f0605d; color: #f0605d; }
+        .route-row { background-color: alpha(currentColor, .05); border: 1px solid alpha(currentColor, .16); border-radius: 6px; padding: 6px 10px; }
+        .tile { background-color: alpha(currentColor, .05); border: 2px solid alpha(currentColor, .18); border-radius: 8px; padding: 5px 5px 7px 5px; }
+        .tile.picked { border-color: #3d8bfd; background-color: alpha(#3d8bfd, .16); }
+        .tilename { font-weight: 800; }
+        .tilenote { font-size: 85%; opacity: .75; }
+        .tilespace { font-size: 85%; font-weight: 600; border-top: 1px solid alpha(currentColor, .18); padding-top: 4px; margin-top: 3px; }
+        .apply { min-height: 40px; font-size: 110%; font-weight: 800; }
+        .working { color: #3d8bfd; font-weight: bold; background-color: alpha(#3d8bfd, .14); border: 1px solid #3d8bfd; border-radius: 6px; padding: 8px 10px; }
+        .ok { color: #3fb67f; font-weight: bold; background-color: alpha(#3fb67f, .14); border: 2px solid #3fb67f; border-radius: 6px; padding: 8px 10px; }
+        .bad { color: #f0605d; font-weight: bold; background-color: alpha(#f0605d, .14); border: 2px solid #f0605d; border-radius: 6px; padding: 8px 10px; }
+        .ph { background-color: alpha(currentColor, .12); border-radius: 5px; }
+        .statusline { background-color: alpha(currentColor, .045); border: 1px solid alpha(currentColor, .16); border-radius: 8px; padding: 8px 10px; opacity: .85; }
+        .advbox { background-color: alpha(currentColor, .045); border: 1px solid alpha(currentColor, .16); border-radius: 8px; padding: 8px; }
         """)
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), p, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
@@ -234,9 +243,11 @@ class Panel:
         outer.add(self.main)
         d.get_content_area().pack_start(outer, True, True, 0)
 
-        h = self.label("InfoStyling", None); h.set_markup("<span size='x-large' weight='bold'>InfoStyling</span>")
-        self.main.pack_start(h, False, False, 0)
-        self.main.pack_start(self.label("Hide text inside an image, then read it back.", "small"), False, False, 0)
+        h = self.label("InfoStyling", None); h.set_markup("<span size='x-large' weight='heavy' foreground='#3d8bfd'>◆</span> <span size='x-large' weight='heavy'>InfoStyling</span>")
+        hb = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2); hb.get_style_context().add_class("is-header")
+        hb.pack_start(h, False, False, 0)
+        hb.pack_start(self.label("Hide text inside an image, then read it back.", "small"), False, False, 0)
+        self.main.pack_start(hb, False, False, 0)
 
         # 1. Your text
         s = self.section("1. Your text")
@@ -263,7 +274,7 @@ class Panel:
         hint.set_markup("Previews show the middle of your image. <b>Shareable</b> saves a JPEG that survives social media (short text). "
                         "<b>Full resolution</b> saves a lossless PNG that holds a whole book, but must be shared as the original file.")
         s.pack_start(hint, False, False, 0)
-        row = Gtk.Box(spacing=12)
+        row = Gtk.Box(spacing=16); row.get_style_context().add_class("route-row")
         self.out_share = Gtk.RadioButton.new_with_label(None, "Shareable (JPEG)")
         self.out_full = Gtk.RadioButton.new_with_label_from_widget(self.out_share, "Full resolution (PNG)")
         self.out_share.connect("toggled", self.on_route)
@@ -271,7 +282,7 @@ class Panel:
         s.pack_start(row, False, False, 0)
         self.space = self.label("", "space")
         s.pack_start(self.space, False, False, 0)
-        grid = Gtk.Grid(column_spacing=8, row_spacing=8, column_homogeneous=True)
+        grid = Gtk.Grid(column_spacing=10, row_spacing=10, column_homogeneous=True)
         self.tiles = {}
         group = None
         for k, l in enumerate(looks.LOOKS):
@@ -297,6 +308,7 @@ class Panel:
         b = Gtk.Button(label="Refresh previews"); b.connect("clicked", lambda *_: self.previews(True)); s.pack_start(b, False, False, 0)
         self.apply_btn = Gtk.Button(label="Apply filter")
         self.apply_btn.get_style_context().add_class("suggested-action")
+        self.apply_btn.get_style_context().add_class("apply")
         self.apply_btn.connect("clicked", self.on_apply)
         s.pack_start(self.apply_btn, False, False, 0)
         self.look_status = self.label("", None, sel=True)
@@ -311,7 +323,7 @@ class Panel:
         s.pack_start(sw, False, False, 0)
         b = Gtk.Button(label="Save decoded text…"); b.connect("clicked", lambda *_: self.run(self.save_file, "Save file")); s.pack_start(b, False, False, 0)
 
-        self.status = self.label("Ready.", None, sel=True)
+        self.status = self.label("Ready.", "statusline", sel=True)
         self.main.pack_start(self.status, False, False, 0)
 
         # Advanced
@@ -319,6 +331,7 @@ class Panel:
         exp.connect("notify::expanded", lambda e, *_: e.set_label(("Hide" if e.get_expanded() else "Show") + " advanced settings " + ("▾" if e.get_expanded() else "▸")))
         adv = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         adv.set_border_width(6)
+        adv.get_style_context().add_class("advbox")
         exp.add(adv)
         self.main.pack_start(exp, False, False, 0)
         row = Gtk.Box(spacing=6); row.pack_start(self.label("Seed", wrap=False), False, False, 0)

@@ -1,9 +1,9 @@
-# InfoStyling for GIMP 3 (v0.13.0)
+# InfoStyling for GIMP 3 (v0.14.0)
 
-Hide text inside an image, then read it back. This is the GIMP version of the InfoStyling Photoshop plugin v0.13.0:
+Hide text inside an image, then read it back. This is the GIMP version of the InfoStyling Photoshop plugin v0.14.0:
 the same 11 looks, the same Shareable (JPEG) and Full resolution (PNG) sizes, the same compression (built-in English
-lexicon) and the same signed seal. Images it makes are read by the InfoStyling Chrome plugin 0.13.0 and the
-Photoshop plugin v0.13.0, and it reads theirs.
+lexicon) and the same signed seal. Images it makes are read by the InfoStyling Chrome plugin 0.14.0 and the
+Photoshop plugin v0.14.0, and it reads theirs.
 
 Open it from **Filters > InfoStyling…** with an RGB image open.
 
