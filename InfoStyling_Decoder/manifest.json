@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "InfoStyling Decoder",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Right-click an image to decode hidden InfoStyling text (High capacity, Invisible, Robust ISB3, Glyph hatch and Color Pop).",
   "minimum_chrome_version": "116",
   "permissions": [
